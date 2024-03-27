@@ -46,31 +46,23 @@
                 </div>
             </nav>
 
-            <form action="admin.php?leht=admin" method="post" enctype="multipart/form-data">
+            <form action="admin.php?leht=admin" method="get">
                 <div class="form-group">
                     <label for="tekst">Sisesta fail</label>
-                    <input type="file" name="minu_fail" id="minu_fail">
+                    <textarea class="form-control" id="tekst" name="tekst" rows="7"></textarea>
                     <input type="submit" name="sisesta" value="uploadeeri" class="btn btn-primary mt-3"></button>
                 </div>
             </form>
-            <?php
-// ADMINI LEHT EI TOOTA
-// TEKSTIFAIL UPLOADIB, AGA ILMA SEESMISE INFOT
-// EI TEA KUIDAS PARANDADA
-            if(!empty($_FILES['minu_fail']['name'])){
-                $sinu_faili_nimi = $_FILES['minu_fail']['name'];
-                $ajutine_fail= $_FILES['minu_fail']['tmp_name'];
-                    
-                $kataloog = 'munad';
-                if(move_uploaded_file($ajutine_fail, $kataloog.'/'.$sinu_faili_nimi)){
-                    echo 'Faili üleslaadimine oli edukas';	
-                    echo $_FILES['minu_fail']['name'];
-                } else {
-                    echo 'Faili üleslaadimine ebaõnnestus';
-                }}
-            ?>
-
             
+            <?php
+            $allikas = 'tekstid.txt';
+            $tekst = fopen($allikas, 'w');
+            if (isset($_GET['sisesta'])) {
+                $tekstget = $_GET['tekst'];
+                echo $tekstget;
+                file_put_contents($allikas, $tekstget);
+            }
+            ?>
 
         </div>
         <script
