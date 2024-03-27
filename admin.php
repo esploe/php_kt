@@ -54,6 +54,9 @@
                 </div>
             </form>
             <?php
+// ADMINI LEHT EI TOOTA
+// TEKSTIFAIL UPLOADIB, AGA ILMA SEESMISE INFOT
+// EI TEA KUIDAS PARANDADA
             if(!empty($_FILES['minu_fail']['name'])){
                 $sinu_faili_nimi = $_FILES['minu_fail']['name'];
                 $ajutine_fail= $_FILES['minu_fail']['tmp_name'];
