@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
     <head>
-        <title>Title</title>
+        <title>Admin</title>
         <meta charset="utf-8" />
         <meta
             name="viewport"
@@ -48,23 +48,78 @@
 
             <form action="admin.php?leht=admin" method="get">
                 <div class="form-group">
-                    <label for="tekst">Sisesta fail</label>
-                    <textarea class="form-control" id="tekst" name="tekst" rows="7"></textarea>
-                    <input type="submit" name="sisesta" value="uploadeeri" class="btn btn-primary mt-3"></button>
+                    <!-- teksti sisestamiseks -->
+                    <label for="tekst">Sisesta tekst</label>
+                    <input type="text" name="pealkiri" id="pealkiri">
+                    <input type="text" name="alapealkiri" id="alapealkiri">
+                    <input type="text" name="sisu" id="sisu">
+                    <input type="submit" name="sisestatekst" value="pane tekst" class="btn btn-primary mt-3"></button>
                 </div>
             </form>
-            
-            <?php
-            $allikas = 'tekstid.txt';
-            $tekst = fopen($allikas, 'w');
-            if (isset($_GET['sisesta'])) {
-                $tekstget = $_GET['tekst'];
-                echo $tekstget;
-                file_put_contents($allikas, $tekstget);
-            }
-            ?>
 
-        </div>
+            <!-- pildid 1 -->
+            <form action="admin.php?leht=admin" method="post">
+                <select name="pildid">
+                    <option value="">Vali pilt</option>
+                    <?php 
+                        $kataloog = 'pildid';
+                        $asukoht=opendir($kataloog);
+                        while($rida = readdir($asukoht)){
+                            if($rida!='.' && $rida!='..'){
+                                echo "<option value='$rida'>$rida</option>\n";
+                            }
+                        }
+                    ?>
+                </select>
+                <input type="submit" value="sisesta">
+            </form>
+
+            <!-- pildid 2 -->
+            <form action="admin.php?leht=admin" method="post">
+                <select name="pildid2">
+                    <option value="">Vali pilt</option>
+                    <?php 
+                        $kataloog = 'pildid';
+                        $asukoht=opendir($kataloog);
+                        while($rida = readdir($asukoht)){
+                            if($rida!='.' && $rida!='..'){
+                                echo "<option value='$rida'>$rida</option>\n";
+                            }
+                        }
+                    ?>
+                </select>
+                <input type="submit" value="sisesta2">
+            </form>
+
+            <!-- reset tekstifail -->
+            <form action="admin.php?leht=admin" method="post">
+                <input type="submit" name="reset" value="reset">
+            </form>
+        <!-- paneme pildi asukohad ja teksti tekstid.txt faili -->
+        <?php
+            if(isset($_GET['sisestatekst'])){
+                $pealkiri = $_GET['pealkiri'];
+                $alapealkiri = $_GET['alapealkiri'];
+                $sisu = $_GET['sisu'];
+                $tekst = $pealkiri."\n".$alapealkiri."\n".$sisu;
+                file_put_contents('tekstid.txt', $tekst.PHP_EOL, FILE_APPEND);
+                file_put_contents('tekstid.txt', $tekst.PHP_EOL, FILE_APPEND);
+            }
+            if(!empty($_POST['pildid'])){
+                $pilt = $_POST['pildid'];
+                $pilt = 'pildid/'.$pilt;
+                file_put_contents('tekstid.txt', $pilt.PHP_EOL, FILE_APPEND);
+            }
+            if(!empty($_POST['pildid2'])){
+                $pilt = $_POST['pildid2'];
+                $pilt = 'pildid/'.$pilt;
+                file_put_contents('tekstid.txt', $pilt.PHP_EOL, FILE_APPEND);
+            }
+            if(isset($_POST['reset'])){
+                file_put_contents('tekstid.txt', '');
+            }
+        ?>
+
         <script
             src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
             integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
@@ -76,5 +131,6 @@
             integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
             crossorigin="anonymous"
         ></script>
+
     </body>
 </html>
