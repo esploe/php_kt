@@ -50,71 +50,129 @@
                 <div class="form-group">
                     <!-- teksti sisestamiseks -->
                     <label for="tekst">Sisesta tekst</label>
+                    <br>
                     <input type="text" name="pealkiri" id="pealkiri">
                     <input type="text" name="alapealkiri" id="alapealkiri">
                     <input type="text" name="sisu" id="sisu">
-                    <input type="submit" name="sisestatekst" value="pane tekst" class="btn btn-primary mt-3"></button>
+                    <br>
+                    <input type="text" name="pealkiri2" id="pealkiri2">
+                    <input type="text" name="alapealkiri2" id="alapealkiri2">
+                    <input type="text" name="sisu2" id="sisu2">
+                    <input type="submit" name="sisestatekst" value="sisesta asjad" class="btn btn-primary mt-3"></button>
                 </div>
             </form>
 
             <!-- pildid 1 -->
-            <form action="admin.php?leht=admin" method="post">
-                <select name="pildid">
-                    <option value="">Vali pilt</option>
-                    <?php 
-                        $kataloog = 'pildid';
-                        $asukoht=opendir($kataloog);
-                        while($rida = readdir($asukoht)){
-                            if($rida!='.' && $rida!='..'){
-                                echo "<option value='$rida'>$rida</option>\n";
-                            }
-                        }
-                    ?>
-                </select>
-                <input type="submit" value="sisesta">
-            </form>
 
-            <!-- pildid 2 -->
-            <form action="admin.php?leht=admin" method="post">
-                <select name="pildid2">
-                    <option value="">Vali pilt</option>
-                    <?php 
-                        $kataloog = 'pildid';
-                        $asukoht=opendir($kataloog);
-                        while($rida = readdir($asukoht)){
-                            if($rida!='.' && $rida!='..'){
-                                echo "<option value='$rida'>$rida</option>\n";
-                            }
-                        }
-                    ?>
-                </select>
-                <input type="submit" value="sisesta2">
+            <form action="admin.php?leht=admin" method="post" enctype="multipart/form-data">
+                <input type="file" name="picture" id="picture">
+                <input type="submit" name="sisestapilt" value="sisesta pildid" class="btn btn-primary mt-3"></button>
             </form>
+            <br>
+            <form action="admin.php?leht=admin" method="post" enctype="multipart/form-data">
+                <input type="file" name="picture2" id="picture2">
+                <input type="submit" name="sisestapilt2" value="sisesta pildid" class="btn btn-primary mt-3"></button>
+            </form>
+            <br>
 
             <!-- reset tekstifail -->
             <form action="admin.php?leht=admin" method="post">
                 <input type="submit" name="reset" value="reset">
             </form>
+
         <!-- paneme pildi asukohad ja teksti tekstid.txt faili -->
         <?php
             if(isset($_GET['sisestatekst'])){
+                // tekst 1
                 $pealkiri = $_GET['pealkiri'];
                 $alapealkiri = $_GET['alapealkiri'];
                 $sisu = $_GET['sisu'];
                 $tekst = $pealkiri."\n".$alapealkiri."\n".$sisu;
                 file_put_contents('tekstid.txt', $tekst.PHP_EOL, FILE_APPEND);
-                file_put_contents('tekstid.txt', $tekst.PHP_EOL, FILE_APPEND);
+
+                // tekst 2
+                $pealkiri2 = $_GET['pealkiri2'];
+                $alapealkiri2 = $_GET['alapealkiri2'];
+                $sisu2 = $_GET['sisu2'];
+                $tekst2 = $pealkiri2."\n".$alapealkiri2."\n".$sisu2;
+                file_put_contents('tekstid.txt', $tekst2.PHP_EOL, FILE_APPEND);
             }
-            if(!empty($_POST['pildid'])){
-                $pilt = $_POST['pildid'];
-                $pilt = 'pildid/'.$pilt;
-                file_put_contents('tekstid.txt', $pilt.PHP_EOL, FILE_APPEND);
+            
+           
+
+            if (isset($_POST['sisestapilt'])) {
+                $sihtKataloog = "pildid/";
+                $sihtFail = $sihtKataloog . basename($_FILES["picture"]["name"]);
+                $uploadOk = 1;
+                $pildiFailiTüüp = strtolower(pathinfo($sihtFail, PATHINFO_EXTENSION));
+
+                // Kontrolli, kas fail juba eksisteerib
+                if (file_exists($sihtFail)) {
+                    echo "Fail eksisteerib juba";
+                    $uploadOk = 0;
+                }
+                // Kortrolli faili suurust
+                if ($_FILES["picture"]["size"] > 500000) {
+                    echo "Fail on liiga suur";
+                    $uploadOk = 0;
+                }
+                // Lubatud failivormingud
+                if ($pildiFailiTüüp != "jpg" && $pildiFailiTüüp != "png" && $pildiFailiTüüp != "jpeg") {
+                    echo "Ainult jpg, jpeg, png on lubatud";
+                    $uploadOk = 0;
+                }
+                // Kontrolli, kas $uploadOk on 0 vea tõttu
+                if ($uploadOk == 0) {
+                    echo "Faili ei laetud üles";
+                // Kui kõik on korras, proovi fail üles laadida
+                } else {
+                    if (move_uploaded_file($_FILES["picture"]["tmp_name"], $sihtFail)) {
+                        $failiAsukoht = $sihtKataloog . basename($_FILES["picture"]["name"]);
+                        file_put_contents('tekstid.txt', $failiAsukoht.PHP_EOL, FILE_APPEND);
+                        echo "Failid üles laaditud";
+                    } else {
+                        echo "Midagi läks valesti";
+                    }
+                }
+                // suht palju ebavajalikke kontrolle, midaiganes
             }
-            if(!empty($_POST['pildid2'])){
-                $pilt = $_POST['pildid2'];
-                $pilt = 'pildid/'.$pilt;
-                file_put_contents('tekstid.txt', $pilt.PHP_EOL, FILE_APPEND);
+
+            if (isset($_POST['sisestapilt2'])){
+                $sihtKataloog = "pildid/";
+                $sihtFail = $sihtKataloog . basename($_FILES["picture2"]["name"]);
+                $uploadOk = 1;
+                $pildiFailiTüüp = strtolower(pathinfo($sihtFail, PATHINFO_EXTENSION));
+
+                // Kontrolli, kas fail juba eksisteerib
+                if (file_exists($sihtFail)) {
+                    echo "Fail eksisteerib juba";
+                    $uploadOk = 0;
+                }
+                // Kortrolli faili suurust
+                if ($_FILES["picture2"]["size"] > 500000) {
+                    echo "Fail on liiga suur";
+                    $uploadOk = 0;
+                }
+                // Lubatud failivormingud
+                if ($pildiFailiTüüp != "jpg" && $pildiFailiTüüp != "png" && $pildiFailiTüüp != "jpeg") {
+                    echo "Ainult jpg, jpeg, png on lubatud";
+                    $uploadOk = 0;
+                }
+                // Kontrolli, kas $uploadOk on 0 vea tõttu
+                if ($uploadOk == 0) {
+                    echo "Faili ei laetud üles";
+                // Kui kõik on korras, proovi fail üles laadida
+                } else {
+                    if (move_uploaded_file($_FILES["picture2"]["tmp_name"], $sihtFail)) {
+                        $failiAsukoht = $sihtKataloog . basename($_FILES["picture2"]["name"]);
+                        file_put_contents('tekstid.txt', $failiAsukoht.PHP_EOL, FILE_APPEND);
+                        echo "Failid üles laaditud";
+                    } else {
+                        echo "Midagi läks valesti";
+                    }
+                }
             }
+
             if(isset($_POST['reset'])){
                 file_put_contents('tekstid.txt', '');
             }
